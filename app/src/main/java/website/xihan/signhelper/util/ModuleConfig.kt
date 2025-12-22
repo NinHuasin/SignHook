@@ -17,5 +17,6 @@ object ModuleConfig : IKVOwner by KVOwner("SHARED_SETTINGS") {
         )
     )
 
+    var hideIcon by kvBool(false)
 
 }

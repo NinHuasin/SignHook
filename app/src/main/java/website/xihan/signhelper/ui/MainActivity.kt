@@ -34,6 +34,7 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +45,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -65,8 +67,11 @@ import website.xihan.signhelper.component.MyDropdownMenuItem
 import website.xihan.signhelper.component.Scaffold
 import website.xihan.signhelper.component.SearchByTextAppBar
 import website.xihan.signhelper.component.items
+import website.xihan.signhelper.util.ModuleConfig
 import website.xihan.signhelper.util.getApkSignature
+import website.xihan.signhelper.util.hideAppIcon
 import website.xihan.signhelper.util.rememberMutableStateOf
+import website.xihan.signhelper.util.showAppIcon
 import website.xihan.signhelper.util.showSignatureDialog
 import website.xihan.signhelper.util.toast
 
@@ -116,7 +121,15 @@ class MainActivity : AppCompatActivity() {
             viewModel.updateSignatureList()
             viewModel.querySignature(query)
         })
-
+        val hideIcon = rememberMutableStateOf(value = ModuleConfig.hideIcon)
+        LaunchedEffect(hideIcon.value) {
+            ModuleConfig.hideIcon = hideIcon.value
+            if (hideIcon.value) {
+                hideAppIcon()
+            } else {
+                showAppIcon()
+            }
+        }
         Scaffold(
             modifier = Modifier
                 .fillMaxSize()
@@ -131,32 +144,32 @@ class MainActivity : AppCompatActivity() {
             topBar = {
                 CenterAlignedTopAppBar(
                     title = {
-                    Text(text = stringResource(id = R.string.app_name))
-                }, modifier = Modifier.fillMaxWidth(), actions = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = {
-                            coroutineScope.launch {
-                                gridState.animateScrollToItem(0)
-                            }
-                        }) {
-                            Icon(Icons.Filled.KeyboardArrowUp, null)
-                        }
-                        AnywhereDropdown(
-                            expanded = topAppBarExpanded.value,
-                            onDismissRequest = { topAppBarExpanded.value = false },
-                            onClick = { topAppBarExpanded.value = true },
-                            surface = {
-                                IconButton(onClick = {
-                                    topAppBarExpanded.value = true
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Filled.MoreVert,
-                                        contentDescription = null
-                                    )
+                        Text(text = stringResource(id = R.string.app_name))
+                    }, modifier = Modifier.fillMaxWidth(), actions = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            IconButton(onClick = {
+                                coroutineScope.launch {
+                                    gridState.animateScrollToItem(0)
                                 }
                             }) {
+                                Icon(Icons.Filled.KeyboardArrowUp, null)
+                            }
+                            AnywhereDropdown(
+                                expanded = topAppBarExpanded.value,
+                                onDismissRequest = { topAppBarExpanded.value = false },
+                                onClick = { topAppBarExpanded.value = true },
+                                surface = {
+                                    IconButton(onClick = {
+                                        topAppBarExpanded.value = true
+                                    }) {
+                                        Icon(
+                                            imageVector = Icons.Filled.MoreVert,
+                                            contentDescription = null
+                                        )
+                                    }
+                                }) {
 //                            MyDropdownMenuItem(
 //                                topAppBarExpanded = topAppBarExpanded,
 //                                text = { Text(stringResource(id = R.string.scope_package_name)) },
@@ -164,23 +177,42 @@ class MainActivity : AppCompatActivity() {
 //                                    scopePackageNameState.value = true
 //                                })
 
-                            MyDropdownMenuItem(
-                                topAppBarExpanded = topAppBarExpanded,
-                                text = { Text(stringResource(id = R.string.title_select_apk)) },
-                                onClick = {
-                                    // 选择后缀为apk的文件
-                                    getContent.launch("application/vnd.android.package-archive")
-                                })
+                                MyDropdownMenuItem(
+                                    topAppBarExpanded = topAppBarExpanded,
+                                    text = {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(stringResource(id = R.string.hide_icon))
+                                            Checkbox(
+                                                checked = hideIcon.value,
+                                                onCheckedChange = hideIcon::value::set
+                                            )
+                                        }
+                                    },
+                                    onClick = {
+                                        topAppBarExpanded.value = true
+                                        hideIcon.value = !hideIcon.value
+                                    }
+                                )
 
-                            MyDropdownMenuItem(
-                                topAppBarExpanded = topAppBarExpanded,
-                                text = { Text(stringResource(id = R.string.exit)) },
-                                onClick = {
-                                    finish()
-                                })
+                                MyDropdownMenuItem(
+                                    topAppBarExpanded = topAppBarExpanded,
+                                    text = { Text(stringResource(id = R.string.title_select_apk)) },
+                                    onClick = {
+                                        // 选择后缀为apk的文件
+                                        getContent.launch("application/vnd.android.package-archive")
+                                    })
+
+                                MyDropdownMenuItem(
+                                    topAppBarExpanded = topAppBarExpanded,
+                                    text = { Text(stringResource(id = R.string.exit)) },
+                                    onClick = {
+                                        finish()
+                                    })
+                            }
                         }
-                    }
-                }, navigationIcon = {}, scrollBehavior = null
+                    }, navigationIcon = {}, scrollBehavior = null
                 )
 
             },
