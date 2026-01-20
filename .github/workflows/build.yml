@@ -1,35 +1,60 @@
-name: Build Debug APK for SignHook
+name: Android CI
 
-on:
-  workflow_dispatch:  # 允许手动点击运行
-  push:
-    branches: [ main ]  # 推送 main 分支也触发
+在:
+  workflow_dispatch:
+推:
+标签:
+      - "v*"
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+工作:
+建筑:
+名字: 以$为基础{{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+战略:
+      fail-fast: 虚假的
+矩阵:
+操作系统: [ ubuntu-latest ]
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          submodules: 'recursive'
+步骤:
+      - 名字: 付款台
+用途；使用；利用: actions/checkout@v4
+与:
+子模块: 'recursive'
+          fetch-depth: 0
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'gradle'
+      - 名字: base64-to-file
+身份证: write_file
+用途；使用；利用: timheuer/base64-to-file@v1.2
+如果: ${{( github.event_name !='pull_request'&& github.ref =='refs/heads/master') || github.ref_type =='tag' }}
+与:
+文件名: 'key.jks'
+编码字符串: ${{ secrets.SIGNING_KEY }}
 
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
+      - 名字: 写入密钥
+如果: ${{( github.event_name !='pull_request'&& github.ref =='refs/heads/master') || github.ref_type =='tag' }}
+跑: |
+touch keystore.properties
+echo storePassword='${{ secrets.KEY_STORE_PASSWORD }}'>> keystore.properties
+echo keyAlias='${{ secrets.ALIAS }}'>> keystore.properties
+echo keyPassword='${{ secrets.KEY_PASSWORD }}'>> keystore.properties
+echo storeFile='${{ steps.write_file.outputs.filePath }}'>> keystore.properties
 
-      - name: Build debug APK
-        run: ./gradlew assembleDebug
+      - 名字: 设置 JDK 21
+用途；使用；利用: actions/setup-java@v4
+与:
+          java-version: '21'
+分布: 'temurin'
+贮存物: 'gradle'
 
-      - name: Upload APK as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-debug.apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+      - 名字: 用梯级建造
+跑: |
+将 gradlew you you:chmod+x gradlew
+./gradlew汇编释放
+
+      - 名字: 将资产上载到版本
+用途；使用；利用: meeDamian/github-release@v2.0.3
+与:
+文件: app/build/outputs/apk/release/*.apk
+代币: ${{ secrets.RELEASE_TOKEN }}
+          allow_override: 真正的
+gzip（GNU zip）是一种用于文件压缩的软件: 虚假的
