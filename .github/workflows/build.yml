@@ -1,4 +1,4 @@
-name: Build Debug APK
+name: Build Debug APK for SignHook
 
 on:
   workflow_dispatch:  # 允许手动点击运行
