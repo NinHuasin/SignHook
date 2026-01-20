@@ -1,35 +1,35 @@
-name: Build Debug APK for SignHook
+名字: 为SignHook构建调试APK
 
-on:
+在:
   workflow_dispatch:  # 允许手动点击运行
-  push:
-    branches: [ main ]  # 推送 main 分支也触发
+推:
+分支: [主要的]  # 推送 main 分支也触发
 
-jobs:
-  build:
+工作:
+建筑:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          submodules: 'recursive'
+步骤:
+      - 名字: 结账代码
+用途；使用；利用: actions/checkout@v4
+与:
+子模块: 'recursive'
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
+设置 JDK 17 you you you；
+导航到下一个占位符。: actions/setup-java@v4
+与:
           java-version: '17'
-          distribution: 'temurin'
-          cache: 'gradle'
+分布: 'temurin'
+贮存物: 'gradle'
 
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
+      - 名字: 使 gradlew
+跑: 将权限添加到 `./gradlew` 使其可执行：`chmod +x ./gradlew`
 
-      - name: Build debug APK
-        run: ./gradlew assembleDebug
+      - 名字: 构建调试APK
+跑: ./gradlew汇编
 
-      - name: Upload APK as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-debug.apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+      - 名字: 作为神器上传APK
+用途；使用；利用: actions/upload-artifact@v4
+与:
+名字: app-debug.apk
+路径: app/build/outputs/apk/debug/app-debug.apk
